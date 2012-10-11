@@ -1,0 +1,30 @@
+From 6c1aeb1bc11799de09da956bc8b441911f7d51c9 Mon Sep 17 00:00:00 2001
+From: Fabio Porcedda <fabio.porcedda@gmail.com>
+Date: Thu, 27 Sep 2012 17:03:15 +0200
+Subject: [PATCH 04/13] ARM: at91/dts: evk-pro3: enable watchdog
+
+Tested on evk-pro3.
+
+Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
+---
+ arch/arm/boot/dts/evk-pro3.dts | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/arch/arm/boot/dts/evk-pro3.dts b/arch/arm/boot/dts/evk-pro3.dts
+index b7354e6..ce959ee 100644
+--- a/arch/arm/boot/dts/evk-pro3.dts
++++ b/arch/arm/boot/dts/evk-pro3.dts
+@@ -26,6 +26,10 @@
+ 				atmel,vbus-gpio = <&pioC 5 0>;
+ 				status = "okay";
+ 			};
++
++			watchdog@fffffd40 {
++				status = "okay";
++			};
+ 		};
+ 
+ 		usb0: ohci@00500000 {
+-- 
+1.7.11.3
+

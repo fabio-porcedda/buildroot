@@ -1,0 +1,8 @@
+BUILD images:
+
+  To build the images, use:
+
+    make ge863_pro3_defconfig
+    make
+
+  Now flash the output/images/uImage and output/images/rootfs.ubi

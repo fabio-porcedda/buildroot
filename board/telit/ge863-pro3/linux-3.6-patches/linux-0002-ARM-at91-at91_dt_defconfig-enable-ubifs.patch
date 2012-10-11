@@ -1,0 +1,25 @@
+From 99faf7c46858127335fea3a322b2479667d7e210 Mon Sep 17 00:00:00 2001
+From: Fabio Porcedda <fabio.porcedda@gmail.com>
+Date: Tue, 25 Sep 2012 09:47:58 +0200
+Subject: [PATCH 02/13] ARM: at91: at91_dt_defconfig: enable ubifs
+
+Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
+---
+ arch/arm/configs/at91_dt_defconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/arm/configs/at91_dt_defconfig b/arch/arm/configs/at91_dt_defconfig
+index 67bc571..e7257a8 100644
+--- a/arch/arm/configs/at91_dt_defconfig
++++ b/arch/arm/configs/at91_dt_defconfig
+@@ -170,6 +170,7 @@ CONFIG_EXT2_FS=y
+ CONFIG_FANOTIFY=y
+ CONFIG_VFAT_FS=y
+ CONFIG_TMPFS=y
++CONFIG_UBIFS_FS=y
+ CONFIG_NFS_FS=y
+ CONFIG_NFS_V3=y
+ CONFIG_ROOT_NFS=y
+-- 
+1.7.11.3
+

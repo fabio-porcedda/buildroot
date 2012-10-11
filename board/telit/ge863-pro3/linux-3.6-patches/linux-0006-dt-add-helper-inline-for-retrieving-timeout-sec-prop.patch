@@ -1,0 +1,38 @@
+From 575c739c4a095ba522a5ca30a9eb089fdba90c23 Mon Sep 17 00:00:00 2001
+From: Fabio Porcedda <fabio.porcedda@gmail.com>
+Date: Tue, 9 Oct 2012 10:16:41 +0200
+Subject: [PATCH 06/13] dt: add helper inline for retrieving timeout-sec
+ property
+
+The first user of this function is the watchdog framework.
+
+Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
+Cc: Grant Likely <grant.likely@secretlab.ca>
+Cc: Rob Herring <rob.herring@calxeda.com>
+---
+ include/linux/of.h | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/include/linux/of.h b/include/linux/of.h
+index 1b11632..4036cfb 100644
+--- a/include/linux/of.h
++++ b/include/linux/of.h
+@@ -462,4 +462,15 @@ static inline int of_property_read_u32(const struct device_node *np,
+ 	return of_property_read_u32_array(np, propname, out_value, 1);
+ }
+ 
++/**
++ * of_get_timeout_sec() - Helper to read the timeout_sec property
++ * @np:		device node from which the property value is to be read.
++ * @timeout:	adress of the output value
++ */
++static inline int of_get_timeout_sec(const struct device_node *np,
++				     u32 *timeout)
++{
++	return of_property_read_u32(np, "timeout-sec", timeout);
++}
++
+ #endif /* _LINUX_OF_H */
+-- 
+1.7.11.3
+
