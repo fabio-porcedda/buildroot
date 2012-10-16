@@ -12,6 +12,9 @@ choice
 	help
 	  Select the specific Barebox version you want to use
 
+config BR2_TARGET_BAREBOX_2011_09
+	bool "2011.09"
+
 config BR2_TARGET_BAREBOX_2012_04
 	bool "2012.04"
 
@@ -41,6 +44,7 @@ endif
 
 config BR2_TARGET_BAREBOX_VERSION
 	string
+	default "2011.09.0"	if BR2_TARGET_BAREBOX_2011_09
 	default "2012.04.0"	if BR2_TARGET_BAREBOX_2012_04
 	default "2012.05.0"	if BR2_TARGET_BAREBOX_2012_05
 	default "2012.06.0"	if BR2_TARGET_BAREBOX_2012_06

@@ -1,0 +1,220 @@
+From 22bf964632900a182736360f6774448f7db00f86 Mon Sep 17 00:00:00 2001
+From: Fabio Porcedda <fabio.porcedda@telit.com>
+Date: Mon, 8 Aug 2011 10:11:32 +0200
+Subject: [PATCH] telit ge863 pro3 hw support: config, watchdog, clock,
+ generic environment, partition
+
+Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
+---
+ arch/arm/boards/at91sam9260ek/config.h      | 10 ++++++-
+ arch/arm/boards/at91sam9260ek/init.c        |  6 ++--
+ arch/arm/boards/telit_ge863_pro3/env/config | 46 +++++++++++++++++++++++++++++
+ arch/arm/configs/telit_ge863_pro3_defconfig | 43 +++++++++++++++++++++++++++
+ arch/arm/mach-at91/at91sam9260.c            | 22 ++++++++++++++
+ defaultenv/bin/boot                         |  2 +-
+ 6 files changed, 124 insertions(+), 5 deletions(-)
+ create mode 100644 arch/arm/boards/telit_ge863_pro3/env/config
+ create mode 100644 arch/arm/configs/telit_ge863_pro3_defconfig
+
+diff --git a/arch/arm/boards/at91sam9260ek/config.h b/arch/arm/boards/at91sam9260ek/config.h
+index 006820c..3414093 100644
+--- a/arch/arm/boards/at91sam9260ek/config.h
++++ b/arch/arm/boards/at91sam9260ek/config.h
+@@ -1,6 +1,14 @@
+ #ifndef __CONFIG_H
+ #define __CONFIG_H
+ 
+-#define AT91_MAIN_CLOCK		18432000	/* 18.432 MHz crystal */
++#define AT91_MAIN_CLOCK			6000000		/*  6.000 MHz crystal */
++
++/* Disable Watchdog */
++#define CONFIG_SYS_WDTC_WDMR_VAL                                \
++                (AT91_WDT_WDIDLEHLT | AT91_WDT_WDDBGHLT |       \
++                 AT91_WDT_WDV |                                 \
++                 AT91_WDT_WDDIS |                               \
++                 AT91_WDT_WDD)
++
+ 
+ #endif	/* __CONFIG_H */
+diff --git a/arch/arm/boards/at91sam9260ek/init.c b/arch/arm/boards/at91sam9260ek/init.c
+index 861e898..474f7b5 100644
+--- a/arch/arm/boards/at91sam9260ek/init.c
++++ b/arch/arm/boards/at91sam9260ek/init.c
+@@ -64,7 +64,7 @@ static struct atmel_nand_data nand_pdata = {
+ 	.cle		= 22,
+ /*	.det_pin	= ... not connected */
+ 	.ecc_base	= (void __iomem *)(AT91_BASE_SYS + AT91_ECC),
+-	.ecc_mode	= NAND_ECC_HW,
++	.ecc_mode	= NAND_ECC_SOFT,
+ 	.rdy_pin	= AT91_PIN_PC13,
+ 	.enable_pin	= AT91_PIN_PC14,
+ #if defined(CONFIG_MTD_NAND_ATMEL_BUSWIDTH_16)
+@@ -158,9 +158,9 @@ static int at91sam9260ek_devices_init(void)
+ 	armlinux_set_bootparams((void *)(AT91_CHIPSELECT_1 + 0x100));
+ 	ek_set_board_type();
+ 
+-	devfs_add_partition("nand0", 0x00000, 0x80000, PARTITION_FIXED, "self_raw");
++	devfs_add_partition("nand0", 0x3C0000, 0x40000, PARTITION_FIXED, "self_raw");
+ 	dev_add_bb_dev("self_raw", "self0");
+-	devfs_add_partition("nand0", 0x40000, 0x40000, PARTITION_FIXED, "env_raw");
++	devfs_add_partition("nand0", 0x440000, 0x20000, PARTITION_FIXED, "env_raw");
+ 	dev_add_bb_dev("env_raw", "env0");
+ 
+ 	return 0;
+diff --git a/arch/arm/boards/telit_ge863_pro3/env/config b/arch/arm/boards/telit_ge863_pro3/env/config
+new file mode 100644
+index 0000000..da42f05
+--- /dev/null
++++ b/arch/arm/boards/telit_ge863_pro3/env/config
+@@ -0,0 +1,46 @@
++#!/bin/sh
++
++# use 'dhcp' to do dhcp in barebox and in kernel
++# use 'none' if you want to skip kernel ip autoconfiguration
++ip=none
++
++# or set your networking parameters here
++#eth0.ipaddr=a.b.c.d
++#eth0.netmask=a.b.c.d
++#eth0.gateway=a.b.c.d
++#eth0.serverip=a.b.c.d
++
++# can be either 'nfs', 'tftp' or 'nand'
++#kernel_loc=tftp
++kernel_loc=nand
++# can be either 'net', 'nand' or 'initrd'
++#rootfs_loc=net
++rootfs_loc=nand
++
++# can be either 'jffs2' or 'ubifs'
++#rootfs_type=ubifs
++rootfs_type=ubifs
++rootfsimage=rootfs.ubi
++
++# The image type of the kernel. Can be uimage, zimage, raw, or raw_lzo
++#kernelimage_type=zimage
++#kernelimage=zImage
++kernelimage_type=uimage
++kernelimage=uImage
++#kernelimage_type=raw
++#kernelimage=Image
++#kernelimage_type=raw_lzo
++#kernelimage=Image.lzo
++
++nand_device=atmel_nand
++#nand_parts="256k(barebox)ro,64k(bareboxenv),1536k(kernel),-(root)"
++nand_parts="256k@0x3C0000(barebox)ro,3072k@0x4C0000(kernel),-(root)"
++rootfs_mtdblock_nand=2
++
++autoboot_timeout=3
++
++bootargs="console=ttyS0,115200"
++#bootargs="console=ttyS0,115200 atmel_nand.on_flash_bbt=1"
++
++# set a fancy prompt (if support is compiled in)
++PS1="\e[1;32mbarebox@\e[1;31m\h:\w\e[0m "
+diff --git a/arch/arm/configs/telit_ge863_pro3_defconfig b/arch/arm/configs/telit_ge863_pro3_defconfig
+new file mode 100644
+index 0000000..aa381e7
+--- /dev/null
++++ b/arch/arm/configs/telit_ge863_pro3_defconfig
+@@ -0,0 +1,43 @@
++CONFIG_ARCH_AT91SAM9260=y
++CONFIG_AEABI=y
++CONFIG_ARM_OPTIMZED_STRING_FUNCTIONS=y
++CONFIG_EXPERIMENTAL=y
++CONFIG_LONGHELP=y
++CONFIG_GLOB=y
++CONFIG_CMDLINE_EDITING=y
++CONFIG_AUTO_COMPLETE=y
++CONFIG_PARTITION=y
++CONFIG_DEFAULT_ENVIRONMENT_GENERIC=y
++CONFIG_DEFAULT_ENVIRONMENT_PATH="arch/arm/boards/telit_ge863_pro3/env"
++CONFIG_POLLER=y
++CONFIG_CMD_EDIT=y
++CONFIG_CMD_SLEEP=y
++CONFIG_CMD_SAVEENV=y
++CONFIG_CMD_LOADENV=y
++CONFIG_CMD_EXPORT=y
++CONFIG_CMD_PRINTENV=y
++CONFIG_CMD_READLINE=y
++CONFIG_CMD_LOADB=y
++CONFIG_CMD_LOADY=y
++CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_MTEST=y
++CONFIG_CMD_FLASH=y
++CONFIG_CMD_RESET=y
++CONFIG_CMD_GO=y
++CONFIG_CMD_TIMEOUT=y
++CONFIG_CMD_PARTITION=y
++CONFIG_CMD_GPIO=y
++CONFIG_NET=y
++CONFIG_NET_DHCP=y
++CONFIG_NET_PING=y
++CONFIG_NET_TFTP=y
++CONFIG_NET_TFTP_PUSH=y
++CONFIG_NET_RESOLV=y
++CONFIG_DRIVER_NET_MACB=y
++# CONFIG_SPI is not set
++CONFIG_MTD=y
++CONFIG_NAND=y
++# CONFIG_NAND_ECC_HW is not set
++# CONFIG_NAND_ECC_HW_SYNDROME is not set
++CONFIG_NAND_ATMEL=y
++CONFIG_UBI=y
+diff --git a/arch/arm/mach-at91/at91sam9260.c b/arch/arm/mach-at91/at91sam9260.c
+index c1f08e7..1beed4e 100644
+--- a/arch/arm/mach-at91/at91sam9260.c
++++ b/arch/arm/mach-at91/at91sam9260.c
+@@ -230,6 +230,24 @@ static struct at91_gpio_bank at91sam9260_gpio[] = {
+ 	}
+ };
+ 
++#include <poller.h>
++#include <mach/io.h>
++#include <mach/at91_wdt.h>
++
++static void watchdog_func(struct poller_struct *poller)
++{
++	at91_sys_write(AT91_WDT_CR, AT91_WDT_WDRSTT | AT91_WDT_KEY);
++}
++
++static struct poller_struct watchdog_poller = {
++        .func = watchdog_func,
++};
++
++static void watchdog_init(void)
++{
++	poller_register(&watchdog_poller);
++}
++
+ static int at91sam9260_initialize(void)
+ {
+ 	/* Init clock subsystem */
+@@ -240,6 +258,10 @@ static int at91sam9260_initialize(void)
+ 
+ 	/* Register GPIO subsystem */
+ 	at91_gpio_init(at91sam9260_gpio, 3);
++
++	/* Register watchdog poller */
++	watchdog_init();
++
+ 	return 0;
+ }
+ 
+diff --git a/defaultenv/bin/boot b/defaultenv/bin/boot
+index de4fa24..f1ac9cb 100644
+--- a/defaultenv/bin/boot
++++ b/defaultenv/bin/boot
+@@ -38,7 +38,7 @@ else
+ 
+ 	if [ x$rootfs_type = xubifs ]; then
+ 		if [ -z $ubiroot ]; then
+-			ubiroot="root"
++			ubiroot="rootfs"
+ 		fi
+ 		bootargs="$bootargs root=ubi0:$ubiroot ubi.mtd=$rootfs_mtdblock"
+ 	else
+-- 
+1.7.11.3
+
