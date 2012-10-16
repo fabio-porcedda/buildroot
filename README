@@ -1,3 +1,5 @@
+This is workin progress
+
 BUILD images:
 
   To build the images, use:
@@ -5,4 +7,22 @@ BUILD images:
     make ge863_pro3_defconfig
     make
 
-  Now flash the output/images/uImage and output/images/rootfs.ubi
+  Use the output/images/barebox.bin, output/images/uImage and
+  output/images/rootfs.ubi files.
+
+FLASH images:
+
+  Replace the telit u-boot with barebox.bin:
+
+    loadb
+    protect off all
+    cp.b 0x20200000 403C0000 $filesize
+    reset
+
+  After reset flash the kernel and rootfs using tftp:
+
+    dhcp
+    eth0.serverip=<tftp server ip adresss>
+    update -d nand -t kernel
+    update -d nand -t rootfs
+    boot
