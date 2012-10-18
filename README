@@ -21,6 +21,7 @@ FLASH images:
 
   After reset flash the kernel and rootfs using tftp:
 
+    saveenv
     dhcp
     eth0.serverip=<tftp server ip adresss>
     update -d nand -t kernel
