@@ -60,7 +60,6 @@ export HOSTARCH := $(shell uname -m | \
 # this top-level Makefile in parallel comment the ".NOTPARALLEL" line and
 # build using the following command:
 #	make BR2_JLEVEL= -j$((`getconf _NPROCESSORS_ONLN`+1))
-.NOTPARALLEL:
 
 # absolute path
 TOPDIR := $(shell pwd)
