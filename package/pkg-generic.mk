@@ -208,7 +208,7 @@ $(BUILD_DIR)/%/.stamp_staging_installed:
 		$(call MESSAGE,"Fixing package configuration files") ;\
 			$(SED)  "s,$(BASE_DIR),@BASE_DIR@,g" \
 				-e "s,$(STAGING_DIR),@STAGING_DIR@,g" \
-				-e 's,^\(exec_\)\?prefix=.*,\1prefix=`echo $$0 | sed s_/bin/sdl-config__`,g' \
+				-e 's,^\(exec_\)\?prefix=.*,\1prefix=`echo $$0 | sed '"'"'s_/[^/]*/[^/]*$$__'"'"'`,g' \
 				-e "s,-I/usr/,-I@STAGING_DIR@/usr/,g" \
 				-e "s,-L/usr/,-L@STAGING_DIR@/usr/,g" \
 				-e "s,@STAGING_DIR@,$(STAGING_DIR),g" \
@@ -247,7 +247,7 @@ $(BUILD_DIR)/%/.stamp_target_installed:
 
 # Remove package sources
 $(BUILD_DIR)/%/.stamp_dircleaned:
-	rm -Rf $(@D)
+	rm -Rf $(@D) $(STAGINGPKG_DIR)/$(call LOWERCASE,$(PKG))
 
 ################################################################################
 # virt-provides-single -- check that provider-pkg is the declared provider for
@@ -413,20 +413,46 @@ $(2)_REDISTRIBUTE		?= YES
 # When a target package is a toolchain dependency set this variable to
 # 'NO' so the 'toolchain' dependency is not added to prevent a circular
 # dependency
+ifeq ($(4),target)
 $(2)_ADD_TOOLCHAIN_DEPENDENCY	?= YES
+else
+$(2)_ADD_TOOLCHAIN_DEPENDENCY	?= NO
+endif
 
 ifeq ($(4),host)
 $(2)_DEPENDENCIES ?= $$(filter-out  host-toolchain $(1),\
 	$$(patsubst host-host-%,host-%,$$(addprefix host-,$$($(3)_DEPENDENCIES))))
 endif
-ifeq ($(4),target)
 ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
 $(2)_DEPENDENCIES += toolchain
-endif
 endif
 
 # Eliminate duplicates in dependencies
 $(2)_FINAL_DEPENDENCIES = $$(sort $$($(2)_DEPENDENCIES))
+
+ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
+ $(2)_STAGING_DIR = $$(STAGINGPKG_DIR)/$(1)
+ $(2)_TARGET_CPPFLAGS = $$(strip $$(TARGET_CPPFLAGS) -I$$($(2)_STAGING_DIR)/usr/include)
+ $(2)_TARGET_LDFLAGS = $$(TARGET_LDFLAGS) -L$$($(2)_STAGING_DIR)/usr/lib -Wl,-rpath,$$($(2)_STAGING_DIR)/usr/lib
+ $(2)_TARGET_CONFIGURE_OPTS = $$(TARGET_CONFIGURE_OPTS) PKG_CONFIG_SYSROOT_DIR="$$($(2)_STAGING_DIR)" PKG_CONFIG_PATH="$$($(2)_STAGING_DIR)/usr/lib/pkgconfig"
+else
+ $(2)_STAGING_DIR = $$(STAGING_DIR)
+ $(2)_TARGET_CONFIGURE_OPTS = $$(TARGET_CONFIGURE_OPTS)
+endif
+
+ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
+ $(2)_STAGING_DIRS = $$(wildcard $$(foreach dep,\
+	$$(filter-out host-% toolchain,$$($(2)_FINAL_DEPENDENCIES)),\
+	$$($$(call UPPERCASE,$$(dep))_STAGING_DIR)))
+
+ define $(2)_PREPARE_STAGING_DIR
+	$$(if $$($(2)_STAGING_DIRS),
+		mkdir -p $$(STAGING_DIR)
+		cp -rdpf $$(addsuffix /*,$$($(2)_STAGING_DIRS)) \
+			$$($(2)_STAGING_DIR))
+ endef
+ $(2)_PRE_CONFIGURE_HOOKS := $(2)_PREPARE_STAGING_DIR $$($(2)_PRE_CONFIGURE_HOOKS)
+endif
 
 $(2)_INSTALL_STAGING		?= NO
 $(2)_INSTALL_IMAGES		?= NO
@@ -601,11 +627,28 @@ $(1)-reconfigure:	$(1)-clean-for-reconfigure $(1)
 # define the PKG variable for all targets, containing the
 # uppercase package variable prefix
 $$($(2)_TARGET_INSTALL_TARGET):		PKG=$(2)
+$$($(2)_TARGET_INSTALL_TARGET):		STAGING_DIR:=$$($(2)_STAGING_DIR)
+$$($(2)_TARGET_INSTALL_TARGET):		TARGET_CPPFLAGS:=$$($(2)_TARGET_CPPFLAGS)
+$$($(2)_TARGET_INSTALL_TARGET):		TARGET_LDFLAGS:=$$($(2)_TARGET_LDFLAGS)
+$$($(2)_TARGET_INSTALL_TARGET):		TARGET_CONFIGURE_OPTS:=$$($(2)_TARGET_CONFIGURE_OPTS)
 $$($(2)_TARGET_INSTALL_STAGING):	PKG=$(2)
+$$($(2)_TARGET_INSTALL_STAGING):	STAGING_DIR:=$$($(2)_STAGING_DIR)
+$$($(2)_TARGET_INSTALL_STAGING):	TARGET_CPPFLAGS:=$$($(2)_TARGET_CPPFLAGS)
+$$($(2)_TARGET_INSTALL_STAGING):	TARGET_LDFLAGS:=$$($(2)_TARGET_LDFLAGS)
+$$($(2)_TARGET_INSTALL_STAGING):	TARGET_CONFIGURE_OPTS:=$$($(2)_TARGET_CONFIGURE_OPTS)
 $$($(2)_TARGET_INSTALL_IMAGES):		PKG=$(2)
 $$($(2)_TARGET_INSTALL_HOST):           PKG=$(2)
+$$($(2)_TARGET_INSTALL_HOST):		STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_BUILD):			PKG=$(2)
+$$($(2)_TARGET_BUILD):			STAGING_DIR:=$$($(2)_STAGING_DIR)
+$$($(2)_TARGET_BUILD):			TARGET_CPPFLAGS:=$$($(2)_TARGET_CPPFLAGS)
+$$($(2)_TARGET_BUILD):			TARGET_LDFLAGS:=$$($(2)_TARGET_LDFLAGS)
+$$($(2)_TARGET_BUILD):			TARGET_CONFIGURE_OPTS:=$$($(2)_TARGET_CONFIGURE_OPTS)
 $$($(2)_TARGET_CONFIGURE):		PKG=$(2)
+$$($(2)_TARGET_CONFIGURE):		STAGING_DIR:=$$($(2)_STAGING_DIR)
+$$($(2)_TARGET_CONFIGURE):		TARGET_CPPFLAGS:=$$($(2)_TARGET_CPPFLAGS)
+$$($(2)_TARGET_CONFIGURE):		TARGET_LDFLAGS:=$$($(2)_TARGET_LDFLAGS)
+$$($(2)_TARGET_CONFIGURE):		TARGET_CONFIGURE_OPTS:=$$($(2)_TARGET_CONFIGURE_OPTS)
 $$($(2)_TARGET_RSYNC):                  SRCDIR=$$($(2)_OVERRIDE_SRCDIR)
 $$($(2)_TARGET_RSYNC):                  PKG=$(2)
 $$($(2)_TARGET_RSYNC_SOURCE):		SRCDIR=$$($(2)_OVERRIDE_SRCDIR)

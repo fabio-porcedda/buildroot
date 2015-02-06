@@ -108,6 +108,8 @@ endif
 
 STAGING_SUBDIR = usr/$(GNU_TARGET_NAME)/sysroot
 STAGING_DIR    = $(HOST_DIR)/$(STAGING_SUBDIR)
+STAGINGNOPKG_DIR := $(STAGING_DIR)
+STAGINGPKG_DIR = $(BASE_DIR)/stagingpkg
 
 TARGET_OPTIMIZATION := $(call qstrip,$(BR2_TARGET_OPTIMIZATION))
 
@@ -245,6 +247,8 @@ export PERL=$(shell which perl)
 # $(HOST_DIR)/usr/lib/perl, so we must make sure that the system perl
 # finds this perl module by exporting the proper value for PERL5LIB.
 export PERL5LIB=$(HOST_DIR)/usr/lib/perl
+
+PKG_CONFIG_HOST_BINARY = $(HOST_DIR)/usr/bin/pkg-config
 
 TARGET_CONFIGURE_OPTS = \
 	PATH=$(BR_PATH) \

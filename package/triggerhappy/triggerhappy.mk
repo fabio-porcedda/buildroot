@@ -11,7 +11,7 @@ TRIGGERHAPPY_LICENSE_FILES = COPYING
 
 define TRIGGERHAPPY_BUILD_CMDS
 	$(MAKE) $(TARGET_CONFIGURE_OPTS) \
-		LINUX_INPUT_H=$(STAGING_DIR)/usr/include/linux/input.h \
+		LINUX_INPUT_H=$(STAGINGNOPKG_DIR)/usr/include/linux/input.h \
 		-C $(@D) thd th-cmd
 endef
 
