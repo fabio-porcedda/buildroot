@@ -59,7 +59,10 @@ endif
 ifndef $(2)_INSTALL_TARGET_CMDS
 define $(2)_INSTALL_TARGET_CMDS
 	cd $$($(2)_SRCDIR) && \
-		$$(LUAROCKS_RUN) make --keep $$($(2)_ROCKSPEC) $$($(2)_BUILD_OPTS)
+		$$(LUAROCKS_RUN) make --keep $$($(2)_ROCKSPEC) \
+		$$($(2)_BUILD_OPTS) OPENSSL_DIR=$$(STAGING_DIR)/usr \
+		EXPAT_DIR=$$(STAGING_DIR)/usr ZLIB_DIR=$$(STAGING_DIR)/usr \
+		SQLITE_DIR=$$(STAGING_DIR)/usr
 endef
 endif
 

@@ -14,12 +14,12 @@ GPSD_DEPENDENCIES = host-scons host-pkgconf
 
 GPSD_LDFLAGS = $(TARGET_LDFLAGS)
 
-GPSD_SCONS_ENV = $(TARGET_CONFIGURE_OPTS)
+GPSD_SCONS_ENV = $(TARGET_CONFIGURE_OPTS) LINKFLAGS="$(TARGET_LDFLAGS)"
 
 GPSD_SCONS_OPTS = \
 	arch=$(ARCH)\
 	prefix=/usr\
-	sysroot=$(STAGING_DIR)\
+	sysroot=$(STAGINGNOPKG_DIR) \
 	strip=no\
 	python=no
 
