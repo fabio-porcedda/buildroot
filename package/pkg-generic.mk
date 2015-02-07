@@ -208,7 +208,7 @@ $(BUILD_DIR)/%/.stamp_staging_installed:
 		$(call MESSAGE,"Fixing package configuration files") ;\
 			$(SED)  "s,$(BASE_DIR),@BASE_DIR@,g" \
 				-e "s,$(STAGING_DIR),@STAGING_DIR@,g" \
-				-e "s,^\(exec_\)\?prefix=.*,\1prefix=@STAGING_DIR@/usr,g" \
+				-e 's,^\(exec_\)\?prefix=.*,\1prefix=`echo $$0 | sed s_/bin/sdl-config__`,g' \
 				-e "s,-I/usr/,-I@STAGING_DIR@/usr/,g" \
 				-e "s,-L/usr/,-L@STAGING_DIR@/usr/,g" \
 				-e "s,@STAGING_DIR@,$(STAGING_DIR),g" \
