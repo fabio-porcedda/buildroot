@@ -446,8 +446,8 @@ ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
 	$$($$(call UPPERCASE,$$(dep))_STAGING_DIR)))
 
  define $(2)_PREPARE_STAGING_DIR
+	mkdir -p $$(STAGING_DIR)/usr/include $$(STAGING_DIR)/usr/lib
 	$$(if $$($(2)_STAGING_DIRS),
-		mkdir -p $$(STAGING_DIR)
 		cp -rdpf $$(addsuffix /*,$$($(2)_STAGING_DIRS)) \
 			$$($(2)_STAGING_DIR))
  endef

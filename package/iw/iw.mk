@@ -10,9 +10,8 @@ IW_SITE = $(BR2_KERNEL_MIRROR)/software/network/iw
 IW_LICENSE = iw license
 IW_LICENSE_FILES = COPYING
 IW_DEPENDENCIES = host-pkgconf libnl
-IW_MAKE_OPTS = CC="$(TARGET_CC)" LD="$(TARGET_LD)" LDFLAGS="$(TARGET_LDFLAGS)"
-IW_MAKE_ENV = PKG_CONFIG="$(HOST_DIR)/usr/bin/pkg-config" \
-	GIT_DIR=$(IW_DIR)
+IW_MAKE_OPTS =
+IW_MAKE_ENV = $(TARGET_CONFIGURE_OPTS) GIT_DIR=$(IW_DIR)
 
 ifeq ($(BR2_STATIC_LIBS),y)
 # libnl needs pthread/m, so we need to explicitly with them when static
