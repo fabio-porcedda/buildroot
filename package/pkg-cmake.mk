@@ -72,10 +72,14 @@ define $(2)_CONFIGURE_CMDS
 	(cd $$($$(PKG)_BUILDDIR) && \
 	rm -f CMakeCache.txt && \
 	PATH=$$(BR_PATH) \
+	PKG_CONFIG_SYSROOT_DIR="$$($(2)_STAGING_DIR)" \
+	PKG_CONFIG_PATH="$$($(2)_STAGING_DIR)/usr/lib/pkgconfig" \
 	$$($$(PKG)_CONF_ENV) $$(HOST_DIR)/usr/bin/cmake $$($$(PKG)_SRCDIR) \
 		-DCMAKE_TOOLCHAIN_FILE="$$(HOST_DIR)/usr/share/buildroot/toolchainfile.cmake" \
 		-DCMAKE_BUILD_TYPE=$$(if $$(BR2_ENABLE_DEBUG),Debug,Release) \
 		-DCMAKE_INSTALL_PREFIX="/usr" \
+		-DCMAKE_C_FLAGS="$$(TARGET_CFLAGS)" \
+		-DCMAKE_EXE_LINKER_FLAGS="$$(TARGET_LDFLAGS)" \
 		-DCMAKE_COLOR_MAKEFILE=OFF \
 		-DBUILD_DOC=OFF \
 		-DBUILD_DOCS=OFF \
