@@ -10,6 +10,7 @@ XINETD_LICENSE = xinetd license
 XINETD_LICENSE_FILES = COPYRIGHT
 
 XINETD_CFLAGS = $(TARGET_CFLAGS)
+XINETD_LIBS = $(TARGET_LDFLAGS)
 
 # Three cases here:
 #  1. We have libtirpc, use it by passing special flags
