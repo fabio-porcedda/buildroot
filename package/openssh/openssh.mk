@@ -8,7 +8,7 @@ OPENSSH_VERSION = 6.7p1
 OPENSSH_SITE = http://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable
 OPENSSH_LICENSE = BSD-3c BSD-2c Public Domain
 OPENSSH_LICENSE_FILES = LICENCE
-OPENSSH_CONF_ENV = LD="$(TARGET_CC)" LDFLAGS="$(TARGET_CFLAGS)"
+OPENSSH_CONF_ENV = LD="$(TARGET_CC)" LDFLAGS="$(TARGET_CFLAGS) -L$(STAGING_DIR)/usr/lib"
 OPENSSH_CONF_OPTS = \
 	--sysconfdir=/etc/ssh \
 	--disable-lastlog \
