@@ -23,7 +23,7 @@ endif
 IPSEC_TOOLS_CONF_OPTS = \
 	  --without-libpam \
 	  --disable-gssapi \
-	  --with-kernel-headers=$(STAGING_DIR)/usr/include
+	  --with-kernel-headers=$(STAGINGNOPKG_DIR)/usr/include
 
 ifeq ($(BR2_PACKAGE_IPSEC_TOOLS_ADMINPORT),y)
 IPSEC_TOOLS_CONF_OPTS += --enable-adminport
