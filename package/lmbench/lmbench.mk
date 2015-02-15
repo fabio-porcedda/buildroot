@@ -15,8 +15,8 @@ LMBENCH_LDLIBS = $(TARGET_LDFLAGS)
 
 ifeq ($(BR2_PACKAGE_LIBTIRPC),y)
 LMBENCH_DEPENDENCIES += host-pkgconf libtirpc
-LMBENCH_CFLAGS += $(shell $(PKG_CONFIG_HOST_BINARY) --cflags libtirpc)
-LMBENCH_LDFLAGS += $(shell $(PKG_CONFIG_HOST_BINARY) --libs libtirpc)
+LMBENCH_CFLAGS += $(call pkgconf-cflags,libtirpc)
+LMBENCH_LDFLAGS += $(call pkgconf-libs,libtirpc)
 endif
 
 define LMBENCH_CONFIGURE_CMDS

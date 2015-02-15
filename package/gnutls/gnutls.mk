@@ -36,8 +36,8 @@ GNUTLS_CONF_OPTS += $(if $(BR2_PACKAGE_ZLIB),--with-libz-prefix=$(STAGING_DIR)/u
 # The check isn't cross-compile friendly
 GNUTLS_CONF_ENV += libopts_cv_with_libregex=yes
 GNUTLS_CONF_OPTS += --with-regex-header=pcreposix.h \
-	--with-libregex-cflags="`$(PKG_CONFIG_HOST_BINARY) libpcreposix --cflags`" \
-	--with-libregex-libs="`$(PKG_CONFIG_HOST_BINARY) libpcreposix --libs`"
+	--with-libregex-cflags="$(call pkgconf-cflags,libpcreposix)" \
+	--with-libregex-libs="$(call pkgconf-libs,libpcreposix)"
 
 # Consider crywrap as part of tools because it needs WCHAR, and it's so too
 ifeq ($(BR2_PACKAGE_GNUTLS_TOOLS),)

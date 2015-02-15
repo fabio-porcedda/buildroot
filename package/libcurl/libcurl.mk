@@ -38,7 +38,8 @@ LIBCURL_CONF_OPTS += --with-gnutls=$(STAGING_DIR)/usr
 LIBCURL_DEPENDENCIES += gnutls
 else ifeq ($(BR2_PACKAGE_LIBNSS),y)
 LIBCURL_CONF_OPTS += --with-nss=$(STAGING_DIR)/usr
-LIBCURL_CONF_ENV += CPPFLAGS="$(TARGET_CPPFLAGS) `$(PKG_CONFIG_HOST_BINARY) nspr nss --cflags`"
+LIBCURL_CONF_ENV += \
+	CPPFLAGS="$(TARGET_CPPFLAGS) $(call pkgconf-cflags,nspr nss)"
 LIBCURL_DEPENDENCIES += libnss
 else
 # polarssl support needs 1.3.x
