@@ -43,3 +43,11 @@ endif
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))
+
+define pkgconf-cflags
+$(shell $(PKG_CONFIG_HOST_BINARY) --cflags $(1))
+endef
+
+define pkgconf-libs
+$(shell $(PKG_CONFIG_HOST_BINARY) --libs $(1))
+endef
