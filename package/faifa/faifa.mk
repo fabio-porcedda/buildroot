@@ -4,10 +4,10 @@
 #
 ################################################################################
 
-FAIFA_VERSION = v0.1
-FAIFA_SITE = $(call github,ffainelli,faifa,$(FAIFA_VERSION))
+FAIFA_VERSION = 62cafe305f4b9f5fb4305dcfb68ae3144efc3353
+FAIFA_SITE = $(call github,fabio-porcedda,faifa,$(FAIFA_VERSION))
 FAIFA_INSTALL_STAGING = YES
-FAIFA_DEPENDENCIES = libpcap host-autoconf
+FAIFA_DEPENDENCIES = libpcap host-autoconf libevent
 FAIFA_LICENSE = BSD-3c
 FAIFA_LICENSE_FILES = COPYING
 
