@@ -65,6 +65,7 @@ endif
 define EXIM_CONFIGURE_TOOLCHAIN
 	$(call exim-config-add,CC,$(TARGET_CC))
 	$(call exim-config-add,CFLAGS,$(TARGET_CFLAGS))
+	$(call exim-config-add,LFLAGS,$(TARGET_LDFLAGS))
 	$(call exim-config-add,AR,$(TARGET_AR) cq)
 	$(call exim-config-add,RANLIB,$(TARGET_RANLIB))
 	$(call exim-config-add,HOSTCC,$(HOSTCC))
