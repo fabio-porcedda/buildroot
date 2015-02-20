@@ -12,7 +12,7 @@ FBV_LICENSE_FILES = COPYING
 
 ### image format dependencies and configure options
 FBV_DEPENDENCIES = # empty
-FBV_CONFIGURE_OPTS = # empty
+FBV_CONFIGURE_OPTS = --libs="$(TARGET_LDFLAGS)"
 ifeq ($(BR2_PACKAGE_FBV_PNG),y)
 FBV_DEPENDENCIES += libpng
 
