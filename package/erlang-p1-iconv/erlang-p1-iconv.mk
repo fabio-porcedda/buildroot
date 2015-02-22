@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-ERLANG_P1_ICONV_VERSION = dff5ee5
+ERLANG_P1_ICONV_VERSION = a16ac9b918626665e066534878eab7a878eea275
 ERLANG_P1_ICONV_SITE = $(call github,processone,eiconv,$(ERLANG_P1_ICONV_VERSION))
 ERLANG_P1_ICONV_LICENSE = GPLv2+
 ERLANG_P1_ICONV_LICENSE_FILES = COPYING
