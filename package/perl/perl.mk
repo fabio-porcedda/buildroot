@@ -33,6 +33,8 @@ PERL_POST_DOWNLOAD_HOOKS += PERL_CROSS_DOWNLOAD
 define PERL_CROSS_EXTRACT
 	$(call suitable-extractor,$(PERL_CROSS_SOURCE)) $(DL_DIR)/$(PERL_CROSS_SOURCE) | \
 	$(TAR) $(TAR_STRIP_COMPONENTS)=1 -C $(@D) $(TAR_OPTIONS) -
+	$(SED) "s/-L\*|-R\*|-Wl,-R\*)/-L\*|-R\*|-Wl,-R\*|-shared)/" \
+		$(@D)/cnf/configure_misc.sh
 endef
 PERL_POST_EXTRACT_HOOKS += PERL_CROSS_EXTRACT
 
