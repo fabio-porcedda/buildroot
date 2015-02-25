@@ -12,5 +12,6 @@ XCB_UTIL_KEYSYMS_SITE = http://xcb.freedesktop.org/dist
 XCB_UTIL_KEYSYMS_LICENSE = MIT
 
 XCB_UTIL_KEYSYMS_INSTALL_STAGING = YES
+XCB_UTIL_KEYSYMS_DEPENDENCIES = libxcb
 
 $(eval $(autotools-package))
