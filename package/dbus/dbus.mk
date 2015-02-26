@@ -44,9 +44,9 @@ ifeq ($(BR2_microblaze),y)
 DBUS_CONF_OPTS += --disable-inotify
 endif
 
-ifeq ($(BR2_PACKAGE_XLIB_LIBX11),y)
+ifeq ($(BR2_PACKAGE_XLIB_LIBSM),y)
 DBUS_CONF_OPTS += --with-x
-DBUS_DEPENDENCIES += xlib_libX11
+DBUS_DEPENDENCIES += xlib_libSM
 else
 DBUS_CONF_OPTS += --without-x
 endif
