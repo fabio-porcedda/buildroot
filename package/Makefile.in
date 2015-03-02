@@ -247,6 +247,8 @@ export PERL=$(shell which perl)
 # finds this perl module by exporting the proper value for PERL5LIB.
 export PERL5LIB=$(HOST_DIR)/usr/lib/perl
 
+PKG_CONFIG_HOST_BINARY = $(HOST_DIR)/usr/bin/pkg-config
+
 TARGET_CONFIGURE_OPTS = \
 	PATH=$(BR_PATH) \
 	AR="$(TARGET_AR)" \
