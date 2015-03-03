@@ -13,7 +13,7 @@ CMAKE_LICENSE_FILES = Copyright.txt
 HOST_CMAKE_DEPENDENCIES = host-pkgconf
 
 define HOST_CMAKE_CONFIGURE_CMDS
-	(cd $(@D); \
+	+(cd $(@D); \
 		LDFLAGS="$(HOST_LDFLAGS)" \
 		CFLAGS="$(HOST_CFLAGS)" \
 		./bootstrap --prefix=$(HOST_DIR)/usr \
