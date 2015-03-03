@@ -394,16 +394,19 @@ $(2)_REDISTRIBUTE		?= YES
 # When a target package is a toolchain dependency set this variable to
 # 'NO' so the 'toolchain' dependency is not added to prevent a circular
 # dependency
-$(2)_ADD_TOOLCHAIN_DEPENDENCY	?= YES
+ifeq ($(4),target)
+ $(2)_ADD_TOOLCHAIN_DEPENDENCY ?= YES
+else
+ $(2)_ADD_TOOLCHAIN_DEPENDENCY ?= NO
+endif
 
 ifeq ($(4),host)
 $(2)_DEPENDENCIES ?= $$(filter-out  host-toolchain $(1),\
 	$$(patsubst host-host-%,host-%,$$(addprefix host-,$$($(3)_DEPENDENCIES))))
 endif
-ifeq ($(4),target)
+
 ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
 $(2)_DEPENDENCIES += toolchain
-endif
 endif
 
 # Eliminate duplicates in dependencies
