@@ -14,6 +14,8 @@ POSTGRESQL_CONFIG_SCRIPTS = pg_config
 POSTGRESQL_CONF_ENV = ac_cv_type_struct_sockaddr_in6=yes
 POSTGRESQL_AUTORECONF = YES
 
+POSTGRESQL_CONF_OPTS += --disable-rpath
+
 ifeq ($(BR2_TOOLCHAIN_USES_UCLIBC),y)
 # PostgreSQL does not build against uClibc with locales
 # enabled, due to an uClibc bug, see
