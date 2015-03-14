@@ -23,6 +23,10 @@ HOST_BOOST_FLAGS = --without-icu \
 	iostreams locale log math mpi program_options python random regex \
 	serialization signals system test thread timer wave)
 
+ifneq ($(PARALLEL_JOBS),)
+BOOST_PARALLEL_JOBS = -j$(PARALLEL_JOBS)
+endif
+
 # coroutine breaks on some weak toolchains and it's new for 1.54+
 BOOST_WITHOUT_FLAGS = coroutine
 
@@ -121,7 +125,7 @@ define HOST_BOOST_CONFIGURE_CMDS
 endef
 
 define BOOST_INSTALL_TARGET_CMDS
-	(cd $(@D) && ./b2 -j$(PARALLEL_JOBS) -q -d+1 \
+	(cd $(@D) && ./b2 $(BOOST_PARALLEL_JOBS) -q -d+1 \
 	--user-config=$(@D)/user-config.jam \
 	$(BOOST_OPTS) \
 	--prefix=$(TARGET_DIR)/usr \
@@ -130,7 +134,7 @@ define BOOST_INSTALL_TARGET_CMDS
 endef
 
 define HOST_BOOST_BUILD_CMDS
-	(cd $(@D) && ./b2 -j$(PARALLEL_JOBS) -q -d+1 \
+	(cd $(@D) && ./b2 $(BOOST_PARALLEL_JOBS) -q -d+1 \
 	--user-config=$(@D)/user-config.jam \
 	$(HOST_BOOST_OPTS) \
 	--ignore-site-config \
@@ -138,7 +142,7 @@ define HOST_BOOST_BUILD_CMDS
 endef
 
 define HOST_BOOST_INSTALL_CMDS
-	(cd $(@D) && ./b2 -j$(PARALLEL_JOBS) -q -d+1 \
+	(cd $(@D) && ./b2 $(BOOST_PARALLEL_JOBS) -q -d+1 \
 	--user-config=$(@D)/user-config.jam \
 	$(HOST_BOOST_OPTS) \
 	--prefix=$(HOST_DIR)/usr \
@@ -147,7 +151,7 @@ define HOST_BOOST_INSTALL_CMDS
 endef
 
 define BOOST_INSTALL_STAGING_CMDS
-	(cd $(@D) && ./bjam -j$(PARALLEL_JOBS) -d+1 \
+	(cd $(@D) && ./bjam $(BOOST_PARALLEL_JOBS) -d+1 \
 	--user-config=$(@D)/user-config.jam \
 	$(BOOST_OPTS) \
 	--prefix=$(STAGING_DIR)/usr \
