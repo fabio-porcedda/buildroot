@@ -10,6 +10,10 @@ JACK2_LICENSE = GPLv2+ (jack server), LGPLv2.1+ (jack library)
 JACK2_DEPENDENCIES = libsamplerate libsndfile alsa-lib host-python
 JACK2_INSTALL_STAGING = YES
 
+ifneq ($(PARALLEL_JOBS),)
+ JACK2_PARALLEL_JOBS = -j$(PARALLEL_JOBS)
+endif
+
 define JACK2_CONFIGURE_CMDS
 	(cd $(@D); \
 		$(TARGET_CONFIGURE_OPTS)	\
@@ -20,7 +24,8 @@ define JACK2_CONFIGURE_CMDS
 endef
 
 define JACK2_BUILD_CMDS
-	(cd $(@D); $(HOST_DIR)/usr/bin/python2 ./waf build -j $(PARALLEL_JOBS))
+	(cd $(@D); $(HOST_DIR)/usr/bin/python2 \
+		./waf build $(JACK2_PARALLEL_JOBS))
 endef
 
 define JACK2_INSTALL_TARGET_CMDS
