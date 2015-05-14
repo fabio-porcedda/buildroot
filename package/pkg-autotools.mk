@@ -159,6 +159,7 @@ $(2)_INSTALL_OPTS                ?= install
 $(2)_INSTALL_STAGING_OPTS	?= DESTDIR=$$(STAGING_DIR) install
 $(2)_INSTALL_TARGET_OPTS		?= DESTDIR=$$(TARGET_DIR)  install
 
+
 # This must be repeated from inner-generic-package, otherwise we get an empty
 # _DEPENDENCIES if _AUTORECONF is YES.  Also filter the result of _AUTORECONF
 # and _GETTEXTIZE away from the non-host rule
@@ -182,6 +183,7 @@ define $(2)_CONFIGURE_CMDS
 	$$(TARGET_CONFIGURE_OPTS) \
 	$$(TARGET_CONFIGURE_ARGS) \
 	$$($$(PKG)_CONF_ENV) \
+	GCC_SYSROOT="$$($$(PKG)_STAGING_DIR)" \
 	CONFIG_SITE=/dev/null \
 	./configure \
 		--target=$$(GNU_TARGET_NAME) \

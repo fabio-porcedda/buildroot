@@ -437,15 +437,11 @@ else
 LIB_SYMLINK = lib32
 endif
 
-$(STAGING_DIR):
-	@mkdir -p $(STAGING_DIR)/bin
-	@mkdir -p $(STAGING_DIR)/lib
-	@ln -snf lib $(STAGING_DIR)/$(LIB_SYMLINK)
-	@mkdir -p $(STAGING_DIR)/usr/lib
-	@ln -snf lib $(STAGING_DIR)/usr/$(LIB_SYMLINK)
-	@mkdir -p $(STAGING_DIR)/usr/include
-	@mkdir -p $(STAGING_DIR)/usr/bin
-	@ln -snf $(STAGING_DIR) $(BASE_DIR)/staging
+$(STAGINGNOPKG_DIR):
+	@mkdir -p $@/bin $@/lib $@/usr/lib $@/usr/include $@/usr/bin
+	@ln -snf lib $@/$(LIB_SYMLINK)
+	@ln -snf lib $@/usr/$(LIB_SYMLINK)
+	@ln -snf $@ $(BASE_DIR)/staging
 
 ifeq ($(BR2_ROOTFS_SKELETON_CUSTOM),y)
 TARGET_SKELETON = $(BR2_ROOTFS_SKELETON_CUSTOM_PATH)
@@ -803,7 +799,7 @@ printvars:
 
 clean:
 	rm -rf $(TARGET_DIR) $(BINARIES_DIR) $(HOST_DIR) \
-		$(BUILD_DIR) $(BASE_DIR)/staging \
+		$(BUILD_DIR) $(BASE_DIR)/staging $(STAGINGPKG_DIR) \
 		$(LEGAL_INFO_DIR) $(GRAPHS_DIR)
 
 distclean: clean

@@ -414,6 +414,27 @@ $(2)_FINAL_DEPENDENCIES = $$(sort $$($(2)_DEPENDENCIES))
 $(2)_FINAL_PATCH_DEPENDENCIES = $$(sort $$($(2)_PATCH_DEPENDENCIES))
 $(2)_FINAL_ALL_DEPENDENCIES = $$(sort $$($(2)_FINAL_DEPENDENCIES) $$($(2)_FINAL_PATCH_DEPENDENCIES))
 
+ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
+  $(2)_STAGING_DIRS = $(STAGING_DIR)/ $$(wildcard $$(foreach dep,\
+	$$(filter-out host-% toolchain,$$($(2)_FINAL_DEPENDENCIES)),\
+	$$($$(call UPPERCASE,$$(dep))_STAGING_DIR)/))
+
+  $(2)_STAGING_DIR = $$(STAGINGPKG_DIR)/$(1)
+
+  define $(2)_PREPARE_STAGING_DIR
+	mkdir -p $$($(2)_STAGING_DIR)
+	rsync -a $$($(2)_STAGING_DIRS) $$($(2)_STAGING_DIR)
+  endef
+
+  $(2)_PRE_CONFIGURE_HOOKS := \
+	$(2)_PREPARE_STAGING_DIR $$($(2)_PRE_CONFIGURE_HOOKS)
+
+  $(2)_TARGET_MAKE_ENV = $$(TARGET_MAKE_ENV) GCC_SYSROOT="$$($(2)_STAGING_DIR)"
+else
+  $(2)_STAGING_DIR = $$(STAGING_DIR)
+  $(2)_TARGET_MAKE_ENV = $$(TARGET_MAKE_ENV)
+endif
+
 $(2)_INSTALL_STAGING		?= NO
 $(2)_INSTALL_IMAGES		?= NO
 $(2)_INSTALL_TARGET		?= YES
@@ -617,10 +638,13 @@ $(1)-reconfigure:	$(1)-clean-for-reconfigure $(1)
 # define the PKG variable for all targets, containing the
 # uppercase package variable prefix
 $$($(2)_TARGET_INSTALL_TARGET):		PKG=$(2)
+$$($(2)_TARGET_INSTALL_TARGET):		STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_INSTALL_STAGING):	PKG=$(2)
+$$($(2)_TARGET_INSTALL_STAGING):	STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_INSTALL_IMAGES):		PKG=$(2)
 $$($(2)_TARGET_INSTALL_HOST):           PKG=$(2)
 $$($(2)_TARGET_BUILD):			PKG=$(2)
+$$($(2)_TARGET_BUILD):			TARGET_MAKE_ENV:=$$($(2)_TARGET_MAKE_ENV)
 $$($(2)_TARGET_CONFIGURE):		PKG=$(2)
 $$($(2)_TARGET_RSYNC):                  SRCDIR=$$($(2)_OVERRIDE_SRCDIR)
 $$($(2)_TARGET_RSYNC):                  PKG=$(2)
