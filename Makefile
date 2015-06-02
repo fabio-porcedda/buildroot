@@ -800,7 +800,7 @@ printvars:
 
 clean:
 	rm -rf $(TARGET_DIR) $(BINARIES_DIR) $(HOST_DIR) \
-		$(BUILD_DIR) $(BASE_DIR)/staging \
+		$(BUILD_DIR) $(BASE_DIR)/staging $(STAGINGPKG_DIR) \
 		$(LEGAL_INFO_DIR) $(GRAPHS_DIR)
 
 distclean: clean
