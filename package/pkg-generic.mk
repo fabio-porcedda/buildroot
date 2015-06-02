@@ -221,7 +221,7 @@ $(BUILD_DIR)/%/.stamp_target_installed:
 
 # Remove package sources
 $(BUILD_DIR)/%/.stamp_dircleaned:
-	rm -Rf $(@D)
+	rm -Rf $(@D) $(STAGING_DIR)
 
 ################################################################################
 # virt-provides-single -- check that provider-pkg is the declared provider for
@@ -413,6 +413,33 @@ endif
 $(2)_FINAL_DEPENDENCIES = $$(sort $$($(2)_DEPENDENCIES))
 $(2)_FINAL_PATCH_DEPENDENCIES = $$(sort $$($(2)_PATCH_DEPENDENCIES))
 $(2)_FINAL_ALL_DEPENDENCIES = $$(sort $$($(2)_FINAL_DEPENDENCIES) $$($(2)_FINAL_PATCH_DEPENDENCIES))
+
+ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
+  $(2)_STAGING_DIRS = $$(wildcard $$(foreach dep,\
+	$$(filter-out host-% toolchain,$$($(2)_FINAL_DEPENDENCIES)),\
+	$$($$(call UPPERCASE,$$(dep))_STAGING_DIR)/))
+
+  $(2)_STAGING_DIR = $$(STAGINGPKG_DIR)/$(1)
+
+  define $(2)_PREPARE_STAGING_DIR
+	mkdir -p $$($(2)_STAGING_DIR)/usr/mkspecs/qws
+	cp -rl $(STAGING_DIR)/* $$($(2)_STAGING_DIR)
+	$$(if $$($(2)_STAGING_DIRS), $$(foreach dir,$$($(2)_STAGING_DIRS),\
+		rsync -au --link-dest=$$(dir) $$(dir) $$($(2)_STAGING_DIR); ))
+	find $$($(2)_STAGING_DIR)/usr/{bin,lib,mkspecs/qws} \
+		-ignore_readdir_race \
+		-name "*[-_]config" -or -name "*.la" -or -name "*.pc" -or \
+		-name "*.prl" -or -name "qmake.conf" | xargs -r sed -i -r \
+		-e "s|$$(STAGINGPKG_DIR)/[^/]*/+usr|$$($(2)_STAGING_DIR)/usr|g" \
+		-e "s|$$(BUILD_DIR)/[^ ]+/([^/ ]+).la|$$($(2)_STAGING_DIR)/usr/lib/\1.la|g" \
+		-e "s|/lib/libpulsecommon|/lib/pulseaudio/libpulsecommon|g"
+  endef
+
+  $(2)_PRE_CONFIGURE_HOOKS := \
+	$(2)_PREPARE_STAGING_DIR $$($(2)_PRE_CONFIGURE_HOOKS)
+else
+  $(2)_STAGING_DIR = $$(STAGING_DIR)
+endif
 
 $(2)_INSTALL_STAGING		?= NO
 $(2)_INSTALL_IMAGES		?= NO
@@ -617,11 +644,15 @@ $(1)-reconfigure:	$(1)-clean-for-reconfigure $(1)
 # define the PKG variable for all targets, containing the
 # uppercase package variable prefix
 $$($(2)_TARGET_INSTALL_TARGET):		PKG=$(2)
+$$($(2)_TARGET_INSTALL_TARGET):		STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_INSTALL_STAGING):	PKG=$(2)
+$$($(2)_TARGET_INSTALL_STAGING):	STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_INSTALL_IMAGES):		PKG=$(2)
 $$($(2)_TARGET_INSTALL_HOST):           PKG=$(2)
 $$($(2)_TARGET_BUILD):			PKG=$(2)
+$$($(2)_TARGET_BUILD):			STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_CONFIGURE):		PKG=$(2)
+$$($(2)_TARGET_CONFIGURE):		STAGING_DIR:=$$($(2)_STAGING_DIR)
 $$($(2)_TARGET_RSYNC):                  SRCDIR=$$($(2)_OVERRIDE_SRCDIR)
 $$($(2)_TARGET_RSYNC):                  PKG=$(2)
 $$($(2)_TARGET_PATCH):			PKG=$(2)
@@ -631,6 +662,7 @@ $$($(2)_TARGET_EXTRACT):		PKG=$(2)
 $$($(2)_TARGET_SOURCE):			PKG=$(2)
 $$($(2)_TARGET_SOURCE):			PKGDIR=$(pkgdir)
 $$($(2)_TARGET_DIRCLEAN):		PKG=$(2)
+$$($(2)_TARGET_DIRCLEAN):		STAGING_DIR:=$$($(2)_STAGING_DIR)
 
 # Compute the name of the Kconfig option that correspond to the
 # package being enabled. We handle three cases: the special Linux
