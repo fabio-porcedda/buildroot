@@ -482,6 +482,8 @@ define QT_CONFIGURE_CONFIG_FILE
 endef
 endif
 
+QT_CONFIGURE_ENV += $(TARGET_MAKE_ENV)
+
 define QT_CONFIGURE_CMDS
 	-[ -f $(@D)/Makefile ] && $(MAKE) -C $(@D) confclean
 	$(QT_CONFIGURE_IPV6)

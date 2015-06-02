@@ -41,7 +41,8 @@ define DTC_INSTALL_STAGING_CMDS
 endef
 
 define DTC_INSTALL_TARGET_CMDS
-	$(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) PREFIX=/usr $(DTC_INSTALL_GOAL)
+	$(TARGET_MAKE_ENV) $(MAKE) \
+		-C $(@D) DESTDIR=$(TARGET_DIR) PREFIX=/usr $(DTC_INSTALL_GOAL)
 endef
 
 $(eval $(generic-package))
