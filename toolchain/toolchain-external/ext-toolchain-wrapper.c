@@ -39,9 +39,12 @@ static char sysroot[PATH_MAX];
  */
 #define EXCLUSIVE_ARGS	3
 
-static char *predef_args[] = {
+static char *predef_common_args[] = {
 	path,
-	"--sysroot", sysroot,
+	"--sysroot", sysroot
+};
+
+static char *predef_gcc_args[] = {
 #ifdef BR_ABI
 	"-mabi=" BR_ABI,
 #endif
@@ -98,6 +101,7 @@ int main(int argc, char **argv)
 	char *basename;
 	char *env_debug;
 	char *paranoid_wrapper;
+	char *gcc_sysroot;
 	int paranoid;
 	int ret, i, count = 0, debug;
 
@@ -145,13 +149,20 @@ int main(int argc, char **argv)
 		perror(__FILE__ ": overflow");
 		return 3;
 	}
-	ret = snprintf(sysroot, sizeof(sysroot), "%s/" BR_SYSROOT, absbasedir);
+	gcc_sysroot = getenv("GCC_SYSROOT");
+	if (gcc_sysroot) {
+		ret = snprintf(sysroot, sizeof(sysroot), "%s", gcc_sysroot);
+	} else {
+		ret = snprintf(sysroot, sizeof(sysroot), "%s/" BR_SYSROOT, \
+			       absbasedir);
+	}
 	if (ret >= sizeof(sysroot)) {
 		perror(__FILE__ ": overflow");
 		return 3;
 	}
 
-	cur = args = malloc(sizeof(predef_args) +
+	cur = args = malloc(sizeof(predef_common_args) +
+			    sizeof(predef_gcc_args) +
 			    (sizeof(char *) * (argc + EXCLUSIVE_ARGS)));
 	if (args == NULL) {
 		perror(__FILE__ ": malloc");
@@ -159,9 +170,14 @@ int main(int argc, char **argv)
 	}
 
 	/* start with predefined args */
-	memcpy(cur, predef_args, sizeof(predef_args));
-	cur += sizeof(predef_args) / sizeof(predef_args[0]);
+	memcpy(cur, predef_common_args, sizeof(predef_common_args));
+	cur += sizeof(predef_common_args) / sizeof(predef_common_args[0]);
 
+	if (strcmp(path + strlen(path) - 2, "ld") !=  0) {
+	memcpy(cur, predef_gcc_args, sizeof(predef_gcc_args));
+	cur += sizeof(predef_gcc_args) / sizeof(predef_gcc_args[0]);
+
+	
 #ifdef BR_FLOAT_ABI
 	/* add float abi if not overridden in args */
 	for (i = 1; i < argc; i++) {
@@ -194,6 +210,7 @@ int main(int argc, char **argv)
 #endif
 	}
 #endif /* ARCH || CPU */
+	}
 
 	paranoid_wrapper = getenv("BR_COMPILER_PARANOID_UNSAFE_PATH");
 	if (paranoid_wrapper && strlen(paranoid_wrapper) > 0)
