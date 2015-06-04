@@ -19,11 +19,13 @@ MONGOOSE_CFLAGS += -DNS_ENABLE_SSL -lssl -lcrypto -lz
 endif
 
 define MONGOOSE_BUILD_CMDS
-	$(TARGET_CC) $(@D)/examples/web_server/web_server.c $(@D)/mongoose.c \
-		-I$(@D) -o $(@D)/examples/web_server/web_server \
+	$(TARGET_MAKE_ENV) $(TARGET_CC) $(@D)/examples/web_server/web_server.c \
+		$(@D)/mongoose.c -I$(@D) \
+		-o $(@D)/examples/web_server/web_server \
 		$(MONGOOSE_CFLAGS) -pthread
-	$(TARGET_CC) -c $(@D)/mongoose.c $(MONGOOSE_CFLAGS) -o $(@D)/mongoose.o
-	$(TARGET_AR) rcs $(@D)/libmongoose.a $(@D)/mongoose.o
+	$(TARGET_MAKE_ENV) $(TARGET_CC) -c $(@D)/mongoose.c $(MONGOOSE_CFLAGS) \
+		-o $(@D)/mongoose.o
+	$(TARGET_MAKE_ENV) $(TARGET_AR) rcs $(@D)/libmongoose.a $(@D)/mongoose.o
 endef
 
 define MONGOOSE_INSTALL_TARGET_CMDS

@@ -111,8 +111,9 @@ endef
 # Need to replicate the LFLAGS in install, as exim still wants to build
 # something when installing...
 define EXIM_INSTALL_TARGET_CMDS
-	DESTDIR=$(TARGET_DIR) INSTALL_ARG="-no_chown -no_symlink" build=br \
-	  $(MAKE1) -C $(@D) $(EXIM_STATIC_FLAGS) install
+	$(TARGET_MAKE_ENV) DESTDIR=$(TARGET_DIR) \
+		INSTALL_ARG="-no_chown -no_symlink" build=br \
+		$(MAKE1) -C $(@D) $(EXIM_STATIC_FLAGS) install
 	chmod u+s $(TARGET_DIR)/usr/sbin/exim
 endef
 

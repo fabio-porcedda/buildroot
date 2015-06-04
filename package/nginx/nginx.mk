@@ -31,6 +31,7 @@ endef
 
 # disable external libatomic_ops because its detection fails.
 NGINX_CONF_ENV += \
+	$(TARGET_MAKE_ENV) \
 	ngx_force_c_compiler=yes \
 	ngx_force_c99_have_variadic_macros=yes \
 	ngx_force_gcc_have_variadic_macros=yes \

@@ -35,16 +35,17 @@ define HOST_LUAROCKS_INSTALL_CMDS
 	rm -f $(LUAROCKS_CONFIG_FILE)
 	$(MAKE1) -C $(@D) install \
 		PREFIX=$(HOST_DIR)/usr
+	echo "gcc_sysroot = os_getenv([[GCC_SYSROOT]])"         >> $(LUAROCKS_CONFIG_FILE)
 	echo "-- BR cross-compilation"                          >> $(LUAROCKS_CONFIG_FILE)
 	echo "variables = {"                                    >> $(LUAROCKS_CONFIG_FILE)
-	echo "   LUA_INCDIR = [[$(STAGING_DIR)/usr/include]],"  >> $(LUAROCKS_CONFIG_FILE)
-	echo "   LUA_LIBDIR = [[$(STAGING_DIR)/usr/lib]],"      >> $(LUAROCKS_CONFIG_FILE)
+	echo "   LUA_INCDIR = gcc_sysroot..[[/usr/include]],"   >> $(LUAROCKS_CONFIG_FILE)
+	echo "   LUA_LIBDIR = gcc_sysroot..[[/usr/lib]],"       >> $(LUAROCKS_CONFIG_FILE)
 	echo "   CC = [[$(TARGET_CC)]],"                        >> $(LUAROCKS_CONFIG_FILE)
 	echo "   LD = [[$(TARGET_CC)]],"                        >> $(LUAROCKS_CONFIG_FILE)
 	echo "   CFLAGS = [[$(LUAROCKS_CFLAGS)]],"              >> $(LUAROCKS_CONFIG_FILE)
 	echo "   LIBFLAG = [[-shared $(TARGET_LDFLAGS)]],"      >> $(LUAROCKS_CONFIG_FILE)
 	echo "}"                                                >> $(LUAROCKS_CONFIG_FILE)
-	echo "external_deps_dirs = { [[$(STAGING_DIR)/usr]] }"  >> $(LUAROCKS_CONFIG_FILE)
+	echo 'external_deps_dirs = { gcc_sysroot..[[/usr]] }'   >> $(LUAROCKS_CONFIG_FILE)
 	echo "gcc_rpath = false"                                >> $(LUAROCKS_CONFIG_FILE)
 	echo "rocks_trees = { [[$(TARGET_DIR)/usr]] }"          >> $(LUAROCKS_CONFIG_FILE)
 	echo "wrap_bin_scripts = false"                         >> $(LUAROCKS_CONFIG_FILE)
@@ -53,7 +54,9 @@ endef
 
 $(eval $(host-generic-package))
 
-LUAROCKS_RUN_ENV = LUA_PATH="$(HOST_DIR)/usr/share/lua/$(LUAINTERPRETER_ABIVER)/?.lua"
+LUAROCKS_RUN_ENV = \
+	GCC_SYSROOT="$(STAGING_DIR)" \
+	LUA_PATH="$(HOST_DIR)/usr/share/lua/$(LUAINTERPRETER_ABIVER)/?.lua"
 LUAROCKS_RUN_CMD = $(LUA_RUN) $(HOST_DIR)/usr/bin/luarocks
 
 LUAROCKS_RUN = $(LUAROCKS_RUN_ENV) $(LUAROCKS_RUN_CMD)

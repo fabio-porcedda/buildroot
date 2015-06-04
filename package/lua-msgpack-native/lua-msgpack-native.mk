@@ -11,7 +11,8 @@ LUA_MSGPACK_NATIVE_LICENSE = Apache-2.0
 LUA_MSGPACK_NATIVE_LICENSE_FILES = LICENSE.txt
 
 define LUA_MSGPACK_NATIVE_BUILD_CMDS
-	$(TARGET_CC) $(TARGET_CFLAGS) -fPIC -shared -o $(@D)/msgpack.so $(@D)/mp.c
+	$(TARGET_MAKE_ENV) $(TARGET_CC) $(TARGET_CFLAGS) \
+		-fPIC -shared -o $(@D)/msgpack.so $(@D)/mp.c
 endef
 
 define LUA_MSGPACK_NATIVE_INSTALL_TARGET_CMDS

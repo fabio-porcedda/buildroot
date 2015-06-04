@@ -221,7 +221,7 @@ $(BUILD_DIR)/%/.stamp_target_installed:
 
 # Remove package sources
 $(BUILD_DIR)/%/.stamp_dircleaned:
-	rm -Rf $(@D)
+	rm -Rf $(@D) $(STAGING_DIR)
 
 ################################################################################
 # virt-provides-single -- check that provider-pkg is the declared provider for
@@ -415,7 +415,7 @@ $(2)_FINAL_PATCH_DEPENDENCIES = $$(sort $$($(2)_PATCH_DEPENDENCIES))
 $(2)_FINAL_ALL_DEPENDENCIES = $$(sort $$($(2)_FINAL_DEPENDENCIES) $$($(2)_FINAL_PATCH_DEPENDENCIES))
 
 ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
-  $(2)_STAGING_DIRS = $(STAGING_DIR)/ $$(wildcard $$(foreach dep,\
+  $(2)_STAGING_DIRS = $$(wildcard $$(foreach dep,\
 	$$(filter-out host-% toolchain,$$($(2)_FINAL_DEPENDENCIES)),\
 	$$($$(call UPPERCASE,$$(dep))_STAGING_DIR)/))
 
@@ -423,11 +423,16 @@ ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
 
   define $(2)_PREPARE_STAGING_DIR
 	mkdir -p $$($(2)_STAGING_DIR)
-	rsync -a $$($(2)_STAGING_DIRS) $$($(2)_STAGING_DIR)
+	cp -rl $(STAGING_DIR)/* $$($(2)_STAGING_DIR)
+	$$(if $$($(2)_STAGING_DIRS), $$(foreach dir,$$($(2)_STAGING_DIRS),rsync -au --link-dest=$$(dir) \
+		$$(dir) $$($(2)_STAGING_DIR); ))
 	find $$($(2)_STAGING_DIR)/usr/{bin,lib} \
-		-name "*-config" -or -name "*.la" -or -name "*.pc" | \
-		xargs -r sed -i \
-		"s|$$(STAGINGPKG_DIR)/[^/]*/usr|$$($(2)_STAGING_DIR)/usr|g"
+		$$(wildcard $$($(2)_STAGING_DIR)/mkspecs/qws)  \
+		-name "*[-_]config" -or -name "*.la" -or -name "*.pc" -or \
+		-name "*.prl" -or -name "qmake.conf" | xargs -r sed -i -r \
+		-e "s|$$(STAGINGPKG_DIR)/[^/]*/+usr|$$($(2)_STAGING_DIR)/usr|g" \
+		-e "s|$$(BUILD_DIR)/[^ ]+/([^/ ]+).la|$$($(2)_STAGING_DIR)/usr/lib/\1.la|g" \
+		-e "s|/lib/libpulsecommon|/lib/pulseaudio/libpulsecommon|g"
   endef
 
   $(2)_PRE_CONFIGURE_HOOKS := \
@@ -657,6 +662,7 @@ $$($(2)_TARGET_EXTRACT):		PKG=$(2)
 $$($(2)_TARGET_SOURCE):			PKG=$(2)
 $$($(2)_TARGET_SOURCE):			PKGDIR=$(pkgdir)
 $$($(2)_TARGET_DIRCLEAN):		PKG=$(2)
+$$($(2)_TARGET_DIRCLEAN):		STAGING_DIR:=$$($(2)_STAGING_DIR)
 
 # Compute the name of the Kconfig option that correspond to the
 # package being enabled. We handle three cases: the special Linux

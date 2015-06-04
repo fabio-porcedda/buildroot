@@ -73,6 +73,7 @@ PYTHON_PYQT_CONF_OPTS = \
 	--bindir $(TARGET_DIR)/usr/bin \
 	--destdir $(TARGET_DIR)/usr/lib/$(PYTHON_PYQT_PYTHON_DIR)/site-packages \
 	--qmake $(HOST_DIR)/usr/bin/qmake \
+	--spec $(STAGING_DIR)/usr/mkspecs/qws/linux-$(QT_EMB_PLATFORM)-g++ \
 	--sysroot $(STAGING_DIR)/usr \
 	-w --confirm-license \
 	--no-designer-plugin \

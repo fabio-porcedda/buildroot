@@ -1,0 +1,54 @@
+From b3ea8783a4d73d437a27befc1d8ab47ef69d4ba1 Mon Sep 17 00:00:00 2001
+From: Thijs Schreijer <thijs@thijsschreijer.nl>
+Date: Tue, 16 Jun 2015 19:31:01 +0200
+Subject: [PATCH 1/4] added 2 functions to the global environment of the
+ config-file loader sandbox; `os_getenv()` and `__dump_env()`
+
+(Upstream patch taken from master branch)
+(cherry picked from commit e1dd6375822d800984e1d3d821899a315bc1b222)
+---
+ src/luarocks/cfg.lua | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
+
+diff --git a/src/luarocks/cfg.lua b/src/luarocks/cfg.lua
+index 99b4077..cf0c0d3 100644
+--- a/src/luarocks/cfg.lua
++++ b/src/luarocks/cfg.lua
+@@ -145,6 +145,14 @@ end
+ cfg.variables = {}
+ cfg.rocks_trees = {}
+ 
++-- some extras for the global enviornment in the config files;
++cfg.os_getenv = os.getenv
++cfg.__dump_env = function()
++  -- debug function, calling it from a config file will show all 
++  -- available globals to that config file
++  print(util.show_table(cfg, "global environment"))
++end
++
+ sys_config_file = site_config.LUAROCKS_SYSCONFIG or sys_config_dir.."/config-"..cfg.lua_version..".lua"
+ local err, errcode
+ sys_config_ok, err, errcode = persist.load_into_table(sys_config_file, cfg)
+@@ -158,11 +166,18 @@ if (not sys_config_ok) and errcode ~= "open" then -- either "load" or "run"; bad
+    os.exit(cfg.errorcodes.CONFIGFILE)
+ end
+ 
+-local env_for_config_file = {
++local env_for_config_file
++env_for_config_file = {
+    home = cfg.home,
+    lua_version = cfg.lua_version,
+    platform = util.make_shallow_copy(detected),
+    processor = proc,
++   os_getenv = os.getenv, 
++   __dump_env = function()
++     -- debug function, calling it from a config file will show all 
++     -- available globals to that config file
++     print(util.show_table(env_for_config_file, "global environment"))
++   end,
+ }
+ 
+ if not site_config.LUAROCKS_FORCE_CONFIG then
+-- 
+2.4.3
+
