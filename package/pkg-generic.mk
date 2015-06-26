@@ -422,12 +422,12 @@ ifeq ($$($(2)_ADD_TOOLCHAIN_DEPENDENCY),YES)
   $(2)_STAGING_DIR = $$(STAGINGPKG_DIR)/$(1)
 
   define $(2)_PREPARE_STAGING_DIR
-	mkdir -p $$($(2)_STAGING_DIR)
+	mkdir -p $$($(2)_STAGING_DIR)/usr/mkspecs/qws
 	cp -rl $(STAGING_DIR)/* $$($(2)_STAGING_DIR)
-	$$(if $$($(2)_STAGING_DIRS), $$(foreach dir,$$($(2)_STAGING_DIRS),rsync -au --link-dest=$$(dir) \
-		$$(dir) $$($(2)_STAGING_DIR); ))
-	find $$($(2)_STAGING_DIR)/usr/{bin,lib} \
-		$$(wildcard $$($(2)_STAGING_DIR)/mkspecs/qws)  \
+	$$(if $$($(2)_STAGING_DIRS), $$(foreach dir,$$($(2)_STAGING_DIRS),\
+		rsync -au --link-dest=$$(dir) $$(dir) $$($(2)_STAGING_DIR); ))
+	find $$($(2)_STAGING_DIR)/usr/{bin,lib,mkspecs/qws} \
+		-ignore_readdir_race \
 		-name "*[-_]config" -or -name "*.la" -or -name "*.pc" -or \
 		-name "*.prl" -or -name "qmake.conf" | xargs -r sed -i -r \
 		-e "s|$$(STAGINGPKG_DIR)/[^/]*/+usr|$$($(2)_STAGING_DIR)/usr|g" \
