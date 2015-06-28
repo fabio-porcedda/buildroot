@@ -39,9 +39,12 @@ static char sysroot[PATH_MAX];
  */
 #define EXCLUSIVE_ARGS	3
 
-static char *predef_args[] = {
+static char *predef_common_args[] = {
 	path,
-	"--sysroot", sysroot,
+	"--sysroot", sysroot
+};
+
+static char *predef_gcc_args[] = {
 #ifdef BR_ABI
 	"-mabi=" BR_ABI,
 #endif
@@ -197,7 +200,8 @@ int main(int argc, char **argv)
 		return 3;
 	}
 
-	cur = args = malloc(sizeof(predef_args) +
+	cur = args = malloc(sizeof(predef_common_args) +
+			    sizeof(predef_gcc_args) +
 			    (sizeof(char *) * (argc + EXCLUSIVE_ARGS)));
 	if (args == NULL) {
 		perror(__FILE__ ": malloc");
@@ -205,10 +209,15 @@ int main(int argc, char **argv)
 	}
 
 	/* start with predefined args */
-	memcpy(cur, predef_args, sizeof(predef_args));
-	cur += sizeof(predef_args) / sizeof(predef_args[0]);
+	memcpy(cur, predef_common_args, sizeof(predef_common_args));
+	cur += sizeof(predef_common_args) / sizeof(predef_common_args[0]);
 
-	cur = add_gcc_args(argc, argv, cur);
+	if (strcmp(path + strlen(path) - 2, "ld") !=  0) {
+		memcpy(cur, predef_gcc_args, sizeof(predef_gcc_args));
+		cur += sizeof(predef_gcc_args) / sizeof(predef_gcc_args[0]);
+
+		cur = add_gcc_args(argc, argv, cur);
+	}
 
 	paranoid_wrapper = getenv("BR_COMPILER_PARANOID_UNSAFE_PATH");
 	if (paranoid_wrapper && strlen(paranoid_wrapper) > 0)
