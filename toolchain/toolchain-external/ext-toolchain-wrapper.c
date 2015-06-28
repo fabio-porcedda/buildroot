@@ -98,6 +98,7 @@ int main(int argc, char **argv)
 	char *basename;
 	char *env_debug;
 	char *paranoid_wrapper;
+	char *gcc_sysroot;
 	int paranoid;
 	int ret, i, count = 0, debug;
 
@@ -145,7 +146,13 @@ int main(int argc, char **argv)
 		perror(__FILE__ ": overflow");
 		return 3;
 	}
-	ret = snprintf(sysroot, sizeof(sysroot), "%s/" BR_SYSROOT, absbasedir);
+	gcc_sysroot = getenv("GCC_SYSROOT");
+	if (gcc_sysroot) {
+		ret = snprintf(sysroot, sizeof(sysroot), "%s", gcc_sysroot);
+	} else {
+		ret = snprintf(sysroot, sizeof(sysroot), "%s/" BR_SYSROOT, \
+			       absbasedir);
+	}
 	if (ret >= sizeof(sysroot)) {
 		perror(__FILE__ ": overflow");
 		return 3;
