@@ -457,7 +457,7 @@ endif
 # End of workaround.
 
 # Variable for other Qt applications to use
-QT_QMAKE = $(HOST_DIR)/usr/bin/qmake -spec qws/linux-$(QT_EMB_PLATFORM)-g++
+QT_QMAKE = $(HOST_DIR)/usr/bin/qmake -spec $(STAGING_DIR)/usr/mkspecs/qws/linux-$(QT_EMB_PLATFORM)-g++
 
 ################################################################################
 # QT_QMAKE_SET -- helper macro to set <variable> = <value> in

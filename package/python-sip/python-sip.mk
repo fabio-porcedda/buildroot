@@ -46,7 +46,7 @@ define PYTHON_SIP_CONFIGURE_CMDS
 			--sipdir $(TARGET_DIR)/usr/share/sip \
 			--sysroot $(STAGING_DIR)/usr \
 			--use-qmake && \
-		$(HOST_DIR)/usr/bin/qmake)
+		$(QT_QMAKE))
 endef
 
 define PYTHON_SIP_BUILD_CMDS
