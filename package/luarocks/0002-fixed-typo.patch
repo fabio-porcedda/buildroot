@@ -1,0 +1,27 @@
+From 53c9599371b3e0815d62d3d34b1f1aef2b2877db Mon Sep 17 00:00:00 2001
+From: Thijs Schreijer <thijs@thijsschreijer.nl>
+Date: Wed, 17 Jun 2015 11:01:48 +0200
+Subject: [PATCH 2/4] fixed typo
+
+(Upstream patch taken from master branch)
+(cherry picked from commit 4792618d8882eb36c9e9d05efac8b1ae336f00cb)
+---
+ src/luarocks/cfg.lua | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/luarocks/cfg.lua b/src/luarocks/cfg.lua
+index cf0c0d3..278be4a 100644
+--- a/src/luarocks/cfg.lua
++++ b/src/luarocks/cfg.lua
+@@ -145,7 +145,7 @@ end
+ cfg.variables = {}
+ cfg.rocks_trees = {}
+ 
+--- some extras for the global enviornment in the config files;
++-- some extras for the global environment in the config files;
+ cfg.os_getenv = os.getenv
+ cfg.__dump_env = function()
+   -- debug function, calling it from a config file will show all 
+-- 
+2.4.3
+
