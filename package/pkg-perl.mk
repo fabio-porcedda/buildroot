@@ -130,7 +130,7 @@ define $(2)_BUILD_CMDS
 	cd $$($$(PKG)_SRCDIR) && if [ -f Build.PL ] ; then \
 		$$(PERL_RUN) Build $$($(2)_BUILD_OPTS) build; \
 	else \
-		$$(MAKE1) \
+		$$(TARGET_MAKE_ENV) $$(MAKE1) \
 			PERL_INC=$$(STAGING_DIR)/usr/lib/perl5/$$(PERL_VERSION)/$$(PERL_ARCHNAME)/CORE \
 			$$($(2)_BUILD_OPTS) pure_all; \
 	fi
